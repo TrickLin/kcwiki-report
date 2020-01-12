@@ -1,16 +1,14 @@
-let { _, SERVER_HOSTNAME } = window;
+let {_, SERVER_HOSTNAME} = window;
 let seiku = -1, eSlot = [], eKyouka = [], dock_id = 0, ship_id = [], ship_ke = [], mapinfo_no = -1, cell_ids = [], maparear_id = -1, mapLevels = [], mapGauges = [], cellData = [], curCellId = -1, enemyData = [], dropData = [];
 let combined_type = 0, preEscape = [], escapeList = [], api_cell_data = [];
-import {
-    reportInit, reportEnemy,
+import { reportInit, reportEnemy,
     reportShipAttr, reportShipAttrByLevelUp, whenMapStart,
-    whenRemodel, reportGetLoseItem,
+    whenRemodel,reportGetLoseItem,
     reportInitEquipByDrop, reportInitEquipByBuild,
     reportInitEquipByRemodel, whenBattleResult,
     reoprtTyku, cacheSync, reportBattle, reportBattleV2,
-    reportFrindly, reportAirBaseAttack, reportNextWayV2
-} from './report';
-import { getTykuV2, getSaku25, getSaku25a, getSaku33 } from './common';
+    reportFrindly, reportAirBaseAttack, reportNextWayV2} from './report';
+import { getTykuV2, getSaku25, getSaku25a, getSaku33} from './common';
 let handleBattleResult = (e) => {
     if (seiku != -1) {
         let { rank, map, mapCell, dropShipId, deckShipId } = e.detail;
@@ -22,8 +20,8 @@ let handleBattleResult = (e) => {
     }
 };
 let handleGameResponse = (e) => {
-    let { method, path, body, postBody } = e.detail ? e.detail : e;
-    let { _ships, _decks, _teitokuLv, _nickName, _nickNameId } = window;
+    let {method, path, body, postBody} = e.detail? e.detail : e;
+    let {_ships, _decks, _teitokuLv, _nickName, _nickNameId} = window;
     switch (path) {
         case '/kcsapi/api_req_sortie/battle':
         case '/kcsapi/api_req_sortie/airbattle':
@@ -43,10 +41,10 @@ let handleGameResponse = (e) => {
         case '/kcsapi/api_req_combined_battle/ec_midnight_battle':
             if (typeof body.api_ship_ke !== "undefined" && body.api_ship_ke !== null)
                 ship_ke = body.api_ship_ke;
-            if (typeof body.api_kouku !== "undefined" && body.api_kouku !== null
-                && typeof body.api_kouku.api_stage1 !== "undefined" && body.api_kouku.api_stage1 !== null
-                && typeof body.api_kouku.api_stage1.api_disp_seiku !== "undefined"
-                && body.api_kouku.api_stage1.api_disp_seiku !== null)
+            if (typeof body.api_kouku !== "undefined" && body.api_kouku !== null 
+            && typeof body.api_kouku.api_stage1 !== "undefined" && body.api_kouku.api_stage1 !== null
+            && typeof body.api_kouku.api_stage1.api_disp_seiku !== "undefined" 
+            && body.api_kouku.api_stage1.api_disp_seiku !== null)
                 seiku = body.api_kouku.api_stage1.api_disp_seiku || -1;
             if (typeof body.api_eSlot !== "undefined" && body.api_eSlot !== null)
                 eSlot = body.api_eSlot;
@@ -133,7 +131,8 @@ let handleGameResponse = (e) => {
                 api_happening: body.api_happening ? body.api_happening : {},
             });
             if (typeof body.api_destruction_battle !== "undefined" && body.api_destruction_battle !== null
-                && typeof body.api_destruction_battle.api_air_base_attack !== "undefined" && body.api_destruction_battle.api_air_base_attack !== null) {
+                && typeof body.api_destruction_battle.api_air_base_attack !== "undefined" && body.api_destruction_battle.api_air_base_attack !== null)
+            {
                 body.api_destruction_battle.api_air_base_attack = JSON.stringify(body.api_destruction_battle.api_air_base_attack)
                 const data = {
                     ...body.api_destruction_battle,
@@ -145,15 +144,23 @@ let handleGameResponse = (e) => {
                 reportAirBaseAttack(data)
             }
             {
-                let deck1 = _decks[0].api_ship.map(item => _ships[item]);
-                let deck2 = _decks[1].api_ship.map(item => _ships[item]);
+                let deck1 = _decks[0].api_ship.map(item => {
+                    let _item = _ships[item];
+                    _item.api_slotitem_ex = _item.api_slot_ex !== -1 ? _slotitems[item] : -1
+                    return _item
+                });
+                let deck2 = _decks[1].api_ship.map(item => {
+                    let _item = _ships[item];
+                    _item.api_slotitem_ex = _item.api_slot_ex !== -1 ? _slotitems[item] : -1
+                    return _item
+                });
                 let slot1 = deck1.map(item => {
-                    if (item) return item.api_slot.map(item => {
+                    if(item) return item.api_slot.map(item => {
                         return item !== -1 ? _slotitems[item] : -1
                     })
                 })
                 let slot2 = deck2.map(item => {
-                    if (item) return item.api_slot.map(item => {
+                    if(item) return item.api_slot.map(item => {
                         return item !== -1 ? _slotitems[item] : -1
                     })
                 })
@@ -191,7 +198,7 @@ let handleGameResponse = (e) => {
                     }
                     reportNextWayV2(data)
                 }, 500)
-
+                
             }
             break;
         case '/kcsapi/api_get_member/material':
@@ -237,8 +244,8 @@ let handleGameResponse = (e) => {
                 itemId: (body.api_get_useitem || {}).api_useitem_id || -1,
             });
             if (typeof body.api_escape !== "undefined" && body.api_escape !== null) {
-                if (body.api_escape.api_escape_idx && body.api_escape.api_escape_idx[0]) preEscape.push(body.api_escape.api_escape_idx[0])
-                if (body.api_escape.api_tow_idx && body.api_escape.api_tow_idx[0]) preEscape.push(body.api_escape.api_tow_idx[0])
+                if(body.api_escape.api_escape_idx && body.api_escape.api_escape_idx[0]) preEscape.push(body.api_escape.api_escape_idx[0])
+                if(body.api_escape.api_tow_idx && body.api_escape.api_tow_idx[0]) preEscape.push(body.api_escape.api_tow_idx[0])
             }
             break;
         case '/kcsapi/api_req_hensei/combined':
@@ -251,8 +258,8 @@ let handleGameResponse = (e) => {
     }
 };
 let handleGameRequest = (e) => {
-    let { method, path, body } = e.detail ? e.detail : e;
-    switch (path) {
+    let {method, path, body} = e.detail? e.detail : e;
+    switch(path) {
         case '/kcsapi/api_req_kaisou/remodeling':
             whenRemodel(body);
             break;
